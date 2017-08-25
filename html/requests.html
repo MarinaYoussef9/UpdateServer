@@ -21,7 +21,31 @@
                     <th colspan="10"><h2>Update Requests</h2></th>
                 </tr>
                 <tr>
+                    <td colspan="10"><a href="/u/act">Act like a client</a></td>
+                </tr>
+                <tr>
                     <td colspan="10"><a href="#" onClick="window.location.reload();return false;">Refresh</a></td>
+                </tr>
+                <tr>
+                    <td colspan="10">
+                        <form style=" margin: 0;" action="/u/requests" method="get">
+                                <label>Product:</label>
+                                <input style="width: 100" type=text name=product value="{{.request.Product}}">
+                                <label>Channel:</label>
+                                <select name="channel">
+                                        <option value=""></option>
+                                        {{range .channels}}
+                                        {{if eq .Name $.request.Channel}}
+                                            <option selected="selected" value="{{.Name}}">{{.Name}}</option>
+                                            {{end}}
+                                            {{if ne .Name $.request.Channel}}
+                                                <option value="{{.Name}}">{{.Name}}</option>
+                                            {{end}}
+                                        {{end}}
+                                </select>
+                                <input type="submit" value="view">
+                        </form>
+                    </td>
                 </tr>
                 <tr>
                     <th>ID</th>

@@ -17,13 +17,41 @@
         </style>
     </head>
         {{ template "head.html" . }}
-        <h1>Release #{{.release.ID}}</h1>
+            <hr>
             <table style="width: 50%">
                 <tr>
                     <th colspan="4">
-                        Associated rules
+                        <div>
+                            <h2 style="display: inline;"> Release # {{.release.ID}} | </h2>
+                            {{if eq .release.Active false}}
+                                    <h2 style="display: inline;color: red;">inactive</h2>
+                            {{end}}
+                            {{if eq .release.Active true}}
+                                    <h2 style="display: inline;color: blue;">active</h2>
+                            {{end}}
+                        </div>
+                        <hr>
+                        <div>
+                            <form style="display: inline; margin: 0;" action="/admin/dashboard/release/{{.release.ID}}/active" method="post">
+                            {{if eq .release.Active false}}
+                                <input type="submit" value="Activate">
+                            {{end}}
+                            {{if eq .release.Active true}}
+                                <input type="submit" value="Deactivate">
+                            {{end}}
+                            </form>
+                            <button style="display: inline;" onclick="DeleteRelease()">Delete</button>
+                        </div>
+
                     </th>
                 </tr>
+                {{if ne (len .rules) 0}}
+                    <tr>
+                        <th colspan="4">
+                            Associated rules
+                        </th>
+                    </tr>
+                {{end}}
                 {{range .rules}}
                 {{if ne .TimeRule.RuleID 0}}
                 <tr>
@@ -94,51 +122,77 @@
                     </tr>
                     <tr>
                         <th>Product :</th>
-                        <th> <textarea name="product">{{.release.Product}}</textarea></th>
+                        <th> <textarea name="product" required>{{.release.Product}}</textarea></th>
                     </tr>
-   
                     <tr>
                         <th>OS : </th>
-                        <th> <textarea name="os">{{.release.OS}}</textarea></th>
+                        <th> 
+                            <input name="os" type=text list=oses value="{{.release.OS}}" required>
+                            <datalist id=oses >
+                                <option value ="Linux"> Linux </option>  
+                                <option value = "Windows"> Windows </option>
+                                <option value = "Mac"> Mac </option>
+                            </datalist>
+                        </th>
                     </tr>
                     <tr>
-                        <th>OS Version :</th>
-                        <th> <textarea name="os_ver">{{.release.OsVer}}</textarea></th>
+                        <th>OS Architecture : </th>
+                        <th>
+                            <input name="os_arch" type=text list=oses_arch value="{{.release.OsArch}}" required>
+                            <datalist id=oses_arch >
+                                <option value = "32"> 32 bits </option>
+                                <option value ="64"> 64 bits </option>  
+                            </datalist>
+                        </th>
                     </tr>
                     <tr>
-                        <th>OS Architecture :</th>
-                        <th> <textarea name="os_arch">{{.release.OsArch}}</textarea></th>
+                        <th>OS Version : </th>
+                        <th> <textarea name="os_ver" required>{{.release.OsVer}}</textarea></th>
                     </tr>
                     <tr>
                         <th>Product Version :</th>
-                        <th> <textarea name="product_ver">{{.release.ProductVersion}}</textarea></th>
-                    </tr>
-                    <tr>
-                        <th>URL :</th>
-                        <th> <textarea name="url" style="width:450">{{.release.URL}}</textarea></th>
+                        <th> <textarea name="product_ver" required>{{.release.ProductVersion}}</textarea></th>
                     </tr>
                     <tr>
                         <th>Title :</th>
-                        <th> <textarea name="title">{{.release.Title}}</textarea></th>
+                        <th> <textarea name="title" required>{{.release.Title}}</textarea></th>
                     </tr>
                     <tr>
-                        <th>Description</th>
-                        <th> <textarea name="desc" style="width:450;height:100">{{.release.Description}}</textarea></th>
+                        <th>URL :</th>
+                        <th> <textarea name="url" style="width:450" required>{{.release.URL}}</textarea></th>
+                    </tr>
+                    <tr>
+                        <th>Description :</th>
+                        <th> <textarea name="desc" style="width:450;height:100" required>{{.release.Description}}</textarea></th>
                     </tr>
                     <tr>
                         <th>CreatedAt</th>
-                        <td>{{.release.CreatedAt}}</textarea></td>
+                        <td>{{.release.CreatedAt}}</td>
                     </tr>
                     <tr>
                         <th>UpdatedAt</th>
-                        <td>{{.release.UpdatedAt}}</textarea></td>
+                        <td>{{.release.UpdatedAt}}</td>
                     </tr>
                     <tr>
-                        <td><a href="/admin/dashboard/del_release/{{.release.ID}}">Delete</a></td>
+                        <td><input type="reset"></td>
                         <td><input type="submit" value="Update"></td>
                     </tr>
                 </table>
             </form>
+            <script type="text/javascript">
+                function GoNav(url){
+                    document.location.href = url;
+                }
+
+                function DeleteRelease() {
+                    if (confirm("You're going to delete the release #{{.release.ID}}") == true) {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('DELETE', '/admin/dashboard/release/{{.release.ID}}/delete');
+                        xhr.send(null);
+                        window.location.href='/admin/dashboard/releases'
+                    } 
+                }
+            </script>
     </body>
 
 </html>

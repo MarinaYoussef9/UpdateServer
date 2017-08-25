@@ -1,4 +1,4 @@
-package model
+package database
 
 import (
 	"time"
@@ -20,7 +20,7 @@ type UpdateRequest struct {
 	ProductVersion string `form:"product_ver"`
 	IP             string `form:"ip"`
 	Status         bool
-	Product        string
+	Product        string `form:"product"`
 	CreatedSince   struct {
 		Month  int
 		Day    int
@@ -34,6 +34,7 @@ type UpdateRequest struct {
 type Release struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	Active         bool   `gorm:"default:'false'"`
 	ID             uint   `gorm:"primary_key"`
 	Channel        string `form:"channel" json:"channel"`
 	OS             string `form:"os" json:"os"`
@@ -53,11 +54,10 @@ type Channel struct {
 	ID            uint   `gorm:"primary_key"`
 	Name          string `form:"name" json:"name"`
 	PublicKey     string `form:"pubkey" json:"pubkey"`
-	ReleasesCount string
-	RequestsCount string
+	PrivateKey    string `form:"privatekey" json:"privatekey"`
+	ReleasesCount int
 }
 
-// Impl is handling gorm
 type Impl struct {
 	DB *gorm.DB
 }
@@ -65,8 +65,7 @@ type Impl struct {
 // ConnectDB initiate the database
 func (i *Impl) ConnectDB(c *config.Configuration) error {
 	var err error
-	// TODO : Move the psqlinfo to config & handle config/yml
-	psqlInfo := "host=" + c.Database.Host + " dbname=" + c.Database.Name + " user=" + c.Database.User + " password=" + c.Database.Password + " sslmode=disable"
+	psqlInfo := "host=" + c.Database.Host + " dbname=" + c.Database.Name + " user=" + c.Database.User + " password=" + c.Database.Password + " port=" + c.Database.Port + " sslmode=disable"
 	i.DB, err = gorm.Open("postgres", psqlInfo)
 	i.DB.LogMode(true)
 	i.DB.AutoMigrate(&UpdateRequest{}, &Release{}, &Channel{}, &Rule{}, &TimeRule{}, &OsRule{}, &VersionRule{}, &IPRule{}, &RollRule{})
@@ -74,15 +73,11 @@ func (i *Impl) ConnectDB(c *config.Configuration) error {
 	return err
 }
 
-//AllRequests return all requests under specific channel
-func (i *Impl) AllRequests(r []UpdateRequest, ch string, p string) []UpdateRequest {
-	i.DB.Table("update_requests").Where("product = ? AND channel = ?", p, ch).Order("created_at desc").Find(&r)
-
-	return r
-}
-
-func (i *Impl) ReleaseMatch(req UpdateRequest, rel *[]Release) {
-	i.DB.Where("product = ? AND channel = ? AND os = ? AND os_arch = ? AND os_ver >= ?",
-		req.Product, req.Channel, req.OS, req.OsArch, req.OsVer).Find(&rel)
-
+func QueryAppend(parent, sub string) string {
+	if parent == "" {
+		return sub
+	} else {
+		ret := parent + " AND " + sub
+		return ret
+	}
 }

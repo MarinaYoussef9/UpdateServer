@@ -20,12 +20,17 @@
     
     <body>
             {{ template "head.html" . }}
-            <h1>New Release</h1>    
+            <hr>
             <form action="/admin/dashboard/new_release" method="post">
             <table style="margin: auto;">
                 <tr>
+                    <th colspan="2">
+                        <h1>New Release</h1>    
+                    </th>
+                </tr>
+                <tr>
                     <th>Product </th>
-                    <th> <textarea name="product"></textarea> </th>
+                    <th> <textarea name="product" required></textarea> </th>
                 </tr>
                 <tr>
                     <th>Channel </th>
@@ -39,36 +44,51 @@
                 </tr>
                 <tr>
                     <th>OS : </th>
-                    <th> <textarea name="os"></textarea> </th>
-                </tr>
-                <tr>
-                    <th>OS Version : </th>
-                    <th> <textarea name="os_ver"></textarea> </th>
+                    <th> 
+                        <input name="os" type=text list=oses required>
+                        <datalist id=oses >
+                            <option value ="Linux"> Linux </option>  
+                            <option value = "Windows"> Windows </option>
+                            <option value = "Mac"> Mac </option>
+                        </datalist>
+                    </th>
                 </tr>
                 <tr>
                     <th>OS Architecture : </th>
-                    <th> <textarea name="os_arch"></textarea> </th>
+                    <th>
+                        <input name="os_arch" type=text list=oses_arch required>
+                        <datalist id=oses_arch >
+                            <option value = "32"> 32 bits </option>
+                            <option value ="64"> 64 bits </option>  
+                        </datalist>
+                    </th>
+                </tr>
+                <tr>
+                    <th>OS Version : </th>
+                    <th> <textarea name="os_ver" required></textarea> </th>
                 </tr>
                 <tr>
                     <th>Product Version : </th>
-                    <th> <textarea name="product_ver"></textarea> </th>
+                    <th> <textarea name="product_ver" required></textarea> </th>
                 </tr>
                 <tr>
                     <th>URL : </th>
-                    <th> <textarea name="url"></textarea> </th>
+                    <th> <textarea name="url" required></textarea> </th>
                 </tr>
                 <tr>
                     <th>Title : </th>
-                    <th> <textarea name="title"></textarea> </th>
+                    <th> <textarea name="title" required></textarea> </th>
                 </tr>
                 <tr>
                     <th>Description : </th>
-                    <th> <textarea name="desc"></textarea> </th>
+                    <th> <textarea name="desc" required></textarea> </th>
                 </tr>
                 <tr>
-                    <td colspan="2"><input type="submit" value="Add"></td>
+                    <td><input type="reset"></td>
+                    <td><input type="submit" value="Add"></td>
                 </tr>  
             </table>
         </form>
+        <hr>
     </body>
 </html>
